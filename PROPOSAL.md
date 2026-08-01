@@ -1,48 +1,39 @@
-# AI alliance
+# Architecture Proposal
 
-**Tech for Good 2026** · GDG Coimbatore · Build weekend Aug 8–9, GRD College
+> Fill this out and commit it by **Friday, July 24 · 11:59 PM IST**. This file *is*
+> your Ideation-Phase submission — no separate form. Keep it living; update it as
+> your design evolves.
 
-**Track:** AI for Sustainable Cities & Climate Action
-**Team code:** TEAM-319
+- **Team name:** _<!-- your team name -->_
+- **Team code:** _<!-- e.g. TEAM-000 (from your organizers) -->_
+- **Track:** _<!-- AI for Good Health & Well-being / Zero Hunger & Economic Growth / Sustainable Cities & Climate Action / Strong Institutions -->_
+- **Members:** _<!-- Name (GitHub @handle), Name (@handle), … -->_
 
-## Problem
+## 1. Problem
+_What problem are you solving, and why does it matter? Who feels it today?_
 
-Coral bleaching is often only detected once it's severe, by which point recovery is unlikely. Reef monitoring today relies on manual diver surveys and lab-based photo review, which can take up to a week to turn around, a delay confirmed by Dr. Sangamesh Uday, Project Coordinator at the Coral Reef Conservation and Research Foundation (CRCRF), Andaman & Nicobar Islands, who is supporting this project with real reef photographs.
+## 2. Who it helps
+_The specific people or community that benefits, and how you'll reach them._
 
-## Who it helps
+## 3. Proposed solution
+_Your approach in a few sentences — what you'll build and how it addresses the problem._
 
-Field volunteers and reef monitors like those at CRCRF, an Andaman-based coral conservation foundation with 16 years of field experience, who currently wait on manual or lab-based photo review to know whether a reef site is bleaching..
+## 4. High-level architecture
+_Key components and how data flows. A diagram is welcome (drop an image in `/docs`)._
 
-## Solution
+```
+<!-- e.g. Mobile PWA → Vercel function → Gemini API (OCR) → Postgres
+             ↘ Cloud Run cron for the nightly sync -->
+```
 
-An AI image classifier that takes an underwater coral photo (from a diver, drone, or phone, including CRCRF-provided images), and returns a Healthy/Bleached classification with a confidence score, so a field volunteer gets an answer in seconds instead of waiting on manual review..
+## 5. Tech stack
+_Languages, frameworks, and the Google/AI tools you plan to use (Gemini API, Cloud Run, Firebase, etc.)._
 
-## Architecture
+## 6. Milestones to hackathon day
+_A rough plan from now to Aug 8–9._
 
- React Web App
-      ↓
-Image Upload
-      ↓
-FastAPI Backend
-      ↓
-Gemini Vision API
-      ↓
-Bleaching Analysis
-      ↓
-SQLite Database
-      ↓
-Survey Report
+- [ ] …
+- [ ] …
 
-## Tech stack
-
- React, FastAPI, Python ,Gemini API, NASA APIs, Open-Meteo API, OBIS API , PostgreSQL (or SQLite for MVP), Leaflet.js, GitHub Docker (optional)
-
-## Getting started
-
-1. Accept your collaborator invite (check your email / GitHub notifications).
-2. Clone this repo and start building.
-3. Commit early and often — this repo is what you present on the day.
-
----
-
-_Created automatically when your proposal was validated._
+## 7. Open questions / help needed
+_Anything you're unsure about or want mentor input on._
