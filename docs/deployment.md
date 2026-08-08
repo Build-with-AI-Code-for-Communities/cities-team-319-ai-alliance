@@ -17,7 +17,7 @@ Neon solves the first problem for the database; R2 solves it for uploaded images
 
 ## 2. Object Storage — Cloudflare R2 (free 10GB tier)
 
-The backend's storage layer (`app/services/storage_service.py`) already supports any S3-compatible provider via `STORAGE_BACKEND=s3` — R2 is the recommended free option:
+The backend's storage layer (`src/backend/app/services/storage_service.py`) already supports any S3-compatible provider via `STORAGE_BACKEND=s3` — R2 is the recommended free option:
 
 1. In the Cloudflare dashboard, go to **R2** and create a bucket (e.g. `coral-ai`).
 2. Create an **R2 API token** (Account API Token, "Object Read & Write" permission) — this gives you an Access Key ID and Secret Access Key.
@@ -64,12 +64,18 @@ Or configure it manually without the blueprint:
 
 ## 4. Frontend — Vercel
 
-1. In Vercel, import the repo with **root directory** set to `src/frontend/`.
-2. Framework preset: **Vite**.
-3. Build command: `npm run build`, output directory: `dist`.
-4. Set environment/proxy: since the frontend calls relative `/api/*` paths, either:
-   - Add a `vercel.json` rewrite forwarding `/api/*` to the Render backend URL, **or**
-   - Point `axios`'s `baseURL` (in `src/services/api.js`) at the full Render URL via a `VITE_API_BASE_URL` env var for production builds.
+1. Deploy the backend first (step 3) so you have its Render URL (e.g. `https://coral-ai-backend.onrender.com`).
+2. In the [Vercel dashboard](https://vercel.com/new), **Import Project** from this GitHub repo.
+3. Vercel needs a subdirectory, not the repo root:
+   - **Root Directory** → `src/frontend/`
+   - **Framework Preset** → Vite (auto-detected)
+   - **Build Command** → `npm run build` (default)
+   - **Output Directory** → `dist` (default)
+4. Add one environment variable before deploying:
+   - `VITE_API_BASE_URL` → `https://coral-ai-backend.onrender.com/api` (your Render URL + `/api`)
+   - `src/services/api.js` reads this at build time — Vite bakes it into the bundle, so it must be set *before* clicking Deploy (not added afterward without a redeploy).
+5. Click **Deploy**. Once live, copy the resulting Vercel URL (e.g. `https://coral-ai.vercel.app`).
+6. Go back to the Render service and update `CORS_ORIGINS` to that Vercel URL, then let it redeploy — until this is set, the backend will reject the frontend's requests with a CORS error.
 
 ## 5. Post-Deploy Checklist
 

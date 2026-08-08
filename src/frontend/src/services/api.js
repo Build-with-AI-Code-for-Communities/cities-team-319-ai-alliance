@@ -1,7 +1,13 @@
 import axios from 'axios'
 
+// In local dev this stays '/api' and vite.config.js proxies it to localhost:8000.
+// In production (e.g. Vercel), set VITE_API_BASE_URL to the deployed backend's
+// full API URL (e.g. https://coral-ai-backend.onrender.com/api) at build time —
+// Vercel and Render are different origins, so a relative path won't reach it.
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api'
+
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE,
   timeout: 30000,
 })
 
@@ -47,5 +53,5 @@ export async function fetchSurvey(surveyId) {
 /** Generate a PDF report for a survey, then return its download URL. */
 export async function generateReport(surveyId) {
   await api.post(`/report/${surveyId}`)
-  return `/api/report/${surveyId}/download`
+  return `${API_BASE}/report/${surveyId}/download`
 }
