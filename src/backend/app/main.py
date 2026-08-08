@@ -20,7 +20,7 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("Starting %s (env=%s)", settings.APP_NAME, settings.ENV)
     init_db()
-    logger.info("Database ready at %s", settings.DATABASE_URL)
+    logger.info("Database ready")
     yield
     logger.info("Shutting down %s", settings.APP_NAME)
 
