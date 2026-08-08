@@ -40,6 +40,7 @@ class AnalyzeRequest(BaseModel):
     image_name: str
     latitude: float | None = None
     longitude: float | None = None
+    submitted_by: str | None = None
 
 
 class SurveyResponse(BaseModel):
@@ -47,6 +48,7 @@ class SurveyResponse(BaseModel):
 
     id: int
     image_name: str
+    submitted_by: str | None
     latitude: float | None
     longitude: float | None
     classification: str
@@ -126,6 +128,7 @@ async def analyze_image(payload: AnalyzeRequest, db: Session = Depends(get_db)) 
 
     survey = Survey(
         image_name=payload.image_name,
+        submitted_by=(payload.submitted_by or "").strip() or None,
         latitude=payload.latitude,
         longitude=payload.longitude,
         classification=classification_result["classification"],

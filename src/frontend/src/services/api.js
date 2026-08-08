@@ -23,11 +23,12 @@ export async function uploadImage(file) {
 }
 
 /** Run the full analysis pipeline on a previously-uploaded image. */
-export async function analyzeImage({ imageName, latitude, longitude }) {
+export async function analyzeImage({ imageName, latitude, longitude, submittedBy }) {
   const { data } = await api.post('/analyze', {
     image_name: imageName,
     latitude,
     longitude,
+    submitted_by: submittedBy || null,
   })
   return data
 }

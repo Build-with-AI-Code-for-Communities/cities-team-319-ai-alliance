@@ -39,8 +39,13 @@ export default function ResultCard({ survey }) {
   return (
     <div className="grid gap-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:grid-cols-2">
       <div>
-        <div className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold ${badgeClass}`}>
-          {survey.classification}
+        <div className="flex items-center justify-between gap-2">
+          <div className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-semibold ${badgeClass}`}>
+            {survey.classification}
+          </div>
+          {survey.submitted_by && (
+            <span className="text-xs text-slate-400">Submitted by {survey.submitted_by}</span>
+          )}
         </div>
 
         <dl className="mt-4 space-y-2 text-sm">

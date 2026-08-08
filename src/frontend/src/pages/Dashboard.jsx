@@ -79,6 +79,7 @@ export default function Dashboard() {
               <th className="px-4 py-3">Classification</th>
               <th className="px-4 py-3">Confidence</th>
               <th className="px-4 py-3">Risk</th>
+              <th className="px-4 py-3">Submitted by</th>
               <th className="px-4 py-3">Date</th>
             </tr>
           </thead>
@@ -94,12 +95,13 @@ export default function Dashboard() {
                 </td>
                 <td className="px-4 py-3">{s.confidence.toFixed(0)}%</td>
                 <td className="px-4 py-3">{s.risk_level ?? 'N/A'}</td>
+                <td className="px-4 py-3 text-slate-500">{s.submitted_by || '—'}</td>
                 <td className="px-4 py-3 text-slate-500">{new Date(s.created_at).toLocaleString()}</td>
               </tr>
             ))}
             {surveys.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-8 text-center text-slate-400">
                   No surveys yet — upload a coral photo to get started.
                 </td>
               </tr>

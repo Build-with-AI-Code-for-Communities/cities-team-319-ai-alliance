@@ -16,6 +16,7 @@ class Survey(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     image_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    submitted_by: Mapped[str | None] = mapped_column(String(120), nullable=True)
 
     latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
