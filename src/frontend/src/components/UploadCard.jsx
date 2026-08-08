@@ -31,11 +31,11 @@ function StageTracker({ stage }) {
   return (
     <div className="flex flex-col items-center gap-5 py-4">
       <div className="h-12 w-12 animate-spin rounded-full border-4 border-ocean-200 border-t-ocean-600" />
-      <div className="flex items-center gap-2 text-sm">
+      <div className="flex flex-col items-start gap-2 text-sm sm:flex-row sm:items-center sm:gap-2">
         {STAGES.map((s, i) => (
           <div key={s.key} className="flex items-center gap-2">
             <span
-              className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
                 i < activeIndex
                   ? 'bg-emerald-500 text-white'
                   : i === activeIndex
@@ -46,7 +46,7 @@ function StageTracker({ stage }) {
               {i < activeIndex ? '✓' : i + 1}
             </span>
             <span className={i === activeIndex ? 'font-medium text-ocean-800' : 'text-slate-400'}>{s.label}</span>
-            {i < STAGES.length - 1 && <span className="mx-1 h-px w-6 bg-slate-200" />}
+            {i < STAGES.length - 1 && <span className="mx-1 hidden h-px w-6 bg-slate-200 sm:inline-block" />}
           </div>
         ))}
       </div>
