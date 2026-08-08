@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: coral-ai-backend
+    runtime: python
+    plan: free
+    rootDir: src/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: CORS_ORIGINS
+        sync: false # set to your deployed Vercel frontend URL, e.g. https://coral-ai.vercel.app
+      - key: DATABASE_URL
+        sync: false # paste your Neon Postgres connection string
+      - key: GEMINI_API_KEY
+        sync: false # https://aistudio.google.com/apikey
+      - key: GEMINI_MODEL
+        value: gemini-2.0-flash
+      - key: STORAGE_BACKEND
+        value: s3
+      - key: S3_ENDPOINT_URL
+        sync: false # https://<account_id>.r2.cloudflarestorage.com for Cloudflare R2
+      - key: S3_REGION
+        value: auto
+      - key: S3_BUCKET_NAME
+        sync: false
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: NASA_SST_ENABLED
+        value: "false"
+      - key: NASA_API_KEY
+        sync: false

@@ -1,0 +1,26 @@
+version: "3.9"
+
+# Optional local Postgres for developers who want production parity instead
+# of the default SQLite. Point DATABASE_URL at this service to use it:
+#   DATABASE_URL=postgresql://coral:coral@localhost:5432/coral_ai
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: coral-ai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: coral
+      POSTGRES_PASSWORD: coral
+      POSTGRES_DB: coral_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coral -d coral_ai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

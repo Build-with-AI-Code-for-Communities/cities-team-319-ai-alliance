@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/Build-with-AI-Code-for-Communities/cities-team-319-ai-alliance/tree/main/docs
+    about: Check the architecture, API, database, and deployment docs before filing an issue.

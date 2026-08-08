@@ -1,0 +1,1 @@
+"""CoralAI backend application package."""

@@ -7,3 +7,19 @@ __pycache__/
 *.pyc
 .DS_Store
 .venv/
+
+# --- CoralAI additions ---
+*.db
+*.sqlite3
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vite/
+Thumbs.db
+.vscode/
+.idea/
+src/backend/uploads/*
+!src/backend/uploads/.gitkeep
+src/backend/reports/*
+!src/backend/reports/.gitkeep
+postgres_data/
