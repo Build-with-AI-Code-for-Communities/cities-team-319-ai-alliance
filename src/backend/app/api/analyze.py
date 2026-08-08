@@ -75,9 +75,10 @@ def _compute_risk(
 
     This is intentionally simple (per the hackathon spec): a base score from
     the classification, boosted if sea temperature crosses warning/critical
-    thresholds, and boosted further if NOAA Coral Reef Watch's own Bleaching
-    Alert Area level (0-4, derived from satellite Degree Heating Weeks) shows
-    the reef is already under heat stress.
+    thresholds, and boosted further by NOAA Coral Reef Watch's Bleaching
+    Alert Level (0-5, derived from satellite Degree Heating Weeks using the
+    same thresholds documented in the team's reef survey methodology paper —
+    Alert Level 1 at DHW >= 4 up to Alert Level 5 at DHW >= 20).
     """
     score = float(_CLASSIFICATION_BASE_SCORE.get(classification, 20))
 
@@ -88,7 +89,9 @@ def _compute_risk(
             score += 10
 
     if bleaching_alert_level is not None:
-        if bleaching_alert_level >= 3:
+        if bleaching_alert_level >= 4:
+            score += 30
+        elif bleaching_alert_level >= 2:
             score += 20
         elif bleaching_alert_level >= 1:
             score += 10
