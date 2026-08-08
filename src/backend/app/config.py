@@ -44,7 +44,7 @@ class Settings(BaseSettings):
 
     # --- Gemini (Tier 1, required) ---
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.0-flash-lite"
+    GEMINI_MODEL: str = "gemini-3.1-flash-lite"
 
     # --- Open-Meteo (Tier 1, no key needed) ---
     OPEN_METEO_BASE_URL: str = "https://api.open-meteo.com/v1/forecast"
