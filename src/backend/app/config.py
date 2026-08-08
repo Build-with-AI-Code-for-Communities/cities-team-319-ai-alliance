@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     # --- Local storage (used when STORAGE_BACKEND=local, and always for the SQLite default) ---
     UPLOAD_DIR: Path = BASE_DIR / "uploads"
     REPORT_DIR: Path = BASE_DIR / "reports"
-    MAX_UPLOAD_SIZE_MB: int = 10
+    MAX_UPLOAD_SIZE_MB: int = 25
     ALLOWED_IMAGE_TYPES: str = "image/jpeg,image/png,image/webp"
     IMAGE_MAX_DIMENSION: int = 1600
 

@@ -70,12 +70,7 @@ export default function Home() {
       </section>
 
       <section ref={uploadRef} className="scroll-mt-20 space-y-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-ocean-900">Survey a Coral Reef</h2>
-          <p className="mt-1 text-slate-500">Drop in a photo below to get started.</p>
-        </div>
-
-        <div className="mx-auto max-w-xl">
+        <div className="mx-auto max-w-3xl">
           <UploadCard onResult={setSurvey} />
         </div>
 

@@ -19,6 +19,13 @@ const RISK_STYLES = {
   Critical: 'text-red-600',
 }
 
+const RISK_BAR_COLORS = {
+  Low: 'bg-emerald-500',
+  Moderate: 'bg-amber-500',
+  High: 'bg-orange-500',
+  Critical: 'bg-red-500',
+}
+
 export default function ResultCard({ survey }) {
   const [downloading, setDownloading] = useState(false)
 
@@ -51,6 +58,23 @@ export default function ResultCard({ survey }) {
           )}
         </div>
 
+        {survey.risk_score != null && (
+          <div className="mt-4">
+            <div className="flex items-baseline justify-between text-sm">
+              <span className="text-slate-500">Coral Risk Score</span>
+              <span className={`font-semibold ${RISK_STYLES[survey.risk_level] ?? ''}`}>
+                {survey.risk_level ?? 'N/A'} · {survey.risk_score.toFixed(0)}/100
+              </span>
+            </div>
+            <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={`h-full rounded-full transition-all ${RISK_BAR_COLORS[survey.risk_level] ?? 'bg-slate-400'}`}
+                style={{ width: `${Math.min(100, Math.max(0, survey.risk_score))}%` }}
+              />
+            </div>
+          </div>
+        )}
+
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between border-b border-slate-100 py-1.5">
             <dt className="text-slate-500">Severity</dt>
@@ -59,12 +83,6 @@ export default function ResultCard({ survey }) {
           <div className="flex justify-between border-b border-slate-100 py-1.5">
             <dt className="text-slate-500">Confidence</dt>
             <dd className="font-medium">{survey.confidence.toFixed(0)}%</dd>
-          </div>
-          <div className="flex justify-between border-b border-slate-100 py-1.5">
-            <dt className="text-slate-500">Risk Level</dt>
-            <dd className={`font-semibold ${RISK_STYLES[survey.risk_level] ?? ''}`}>
-              {survey.risk_level ?? 'N/A'}
-            </dd>
           </div>
           <div className="flex justify-between border-b border-slate-100 py-1.5">
             <dt className="text-slate-500">Temperature</dt>
