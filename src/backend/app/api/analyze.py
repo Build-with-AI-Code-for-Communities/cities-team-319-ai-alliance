@@ -18,6 +18,7 @@ from app.database import get_db
 from app.models.survey import Survey
 from app.services.gemini_service import analyze_coral_image
 from app.services.nasa_service import fetch_nasa_sst
+from app.services.noaa_service import fetch_coral_reef_watch
 from app.services.storage_service import StorageError, get_storage
 from app.services.weather_service import fetch_weather
 from app.utils.logger import get_logger
@@ -65,12 +66,18 @@ class SurveyResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-def _compute_risk(classification: str, temperature: float | None) -> tuple[str, float]:
-    """Combine classification and temperature into a single risk score/level.
+def _compute_risk(
+    classification: str,
+    temperature: float | None,
+    bleaching_alert_level: int | None = None,
+) -> tuple[str, float]:
+    """Combine classification, temperature, and NOAA heat-stress data into a risk score/level.
 
     This is intentionally simple (per the hackathon spec): a base score from
     the classification, boosted if sea temperature crosses warning/critical
-    thresholds associated with bleaching events.
+    thresholds, and boosted further if NOAA Coral Reef Watch's own Bleaching
+    Alert Area level (0-4, derived from satellite Degree Heating Weeks) shows
+    the reef is already under heat stress.
     """
     score = float(_CLASSIFICATION_BASE_SCORE.get(classification, 20))
 
@@ -78,6 +85,12 @@ def _compute_risk(classification: str, temperature: float | None) -> tuple[str, 
         if temperature >= settings.RISK_TEMP_CRITICAL_C:
             score += 20
         elif temperature >= settings.RISK_TEMP_WARNING_C:
+            score += 10
+
+    if bleaching_alert_level is not None:
+        if bleaching_alert_level >= 3:
+            score += 20
+        elif bleaching_alert_level >= 1:
             score += 10
 
     score = max(0.0, min(100.0, score))
@@ -123,8 +136,19 @@ async def analyze_image(payload: AnalyzeRequest, db: Session = Depends(get_db)) 
             weather["sea_surface_temperature_c"] = nasa_result["sst_c"]
             weather["source"] = "open-meteo+nasa"
 
-    temperature = weather.get("sea_surface_temperature_c") or weather.get("temperature_c")
-    risk_level, risk_score = _compute_risk(classification_result["classification"], temperature)
+    crw = await fetch_coral_reef_watch(payload.latitude, payload.longitude)
+    weather["coral_reef_watch"] = crw
+
+    temperature = (
+        crw.get("sst_c")
+        or weather.get("sea_surface_temperature_c")
+        or weather.get("temperature_c")
+    )
+    risk_level, risk_score = _compute_risk(
+        classification_result["classification"],
+        temperature,
+        crw.get("bleaching_alert_level"),
+    )
 
     survey = Survey(
         image_name=payload.image_name,

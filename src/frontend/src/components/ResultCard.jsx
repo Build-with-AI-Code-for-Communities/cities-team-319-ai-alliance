@@ -23,6 +23,9 @@ export default function ResultCard({ survey }) {
   const [downloading, setDownloading] = useState(false)
 
   const badgeClass = SEVERITY_STYLES[survey.classification] ?? SEVERITY_STYLES.Unknown
+  const crw = survey.weather?.coral_reef_watch
+  const crwLabel = crw?.bleaching_alert_label
+  const crwDhw = crw?.degree_heating_weeks
 
   async function handleDownload() {
     try {
@@ -69,6 +72,15 @@ export default function ResultCard({ survey }) {
               {survey.temperature != null ? `${survey.temperature.toFixed(1)} °C` : 'N/A'}
             </dd>
           </div>
+          {crwLabel && (
+            <div className="flex justify-between border-b border-slate-100 py-1.5">
+              <dt className="text-slate-500">NOAA Reef Heat Stress</dt>
+              <dd className="font-medium">
+                {crwLabel}
+                {crwDhw != null && ` (DHW ${crwDhw.toFixed(1)})`}
+              </dd>
+            </div>
+          )}
         </dl>
 
         <div className="mt-4 space-y-3">
