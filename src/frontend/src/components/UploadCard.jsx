@@ -24,6 +24,8 @@ export default function UploadCard({ onResult }) {
   const [preview, setPreview] = useState(null)
   const [stage, setStage] = useState('idle') // idle | uploading | analyzing
   const [submittedBy, setSubmittedBy] = useState('')
+  const [manualLat, setManualLat] = useState('')
+  const [manualLon, setManualLon] = useState('')
 
   const onDrop = useCallback(
     async (acceptedFiles) => {
@@ -37,7 +39,12 @@ export default function UploadCard({ onResult }) {
         const uploaded = await uploadImage(file)
 
         let { latitude, longitude } = uploaded
-        if (latitude == null || longitude == null) {
+        const hasManualLocation = manualLat.trim() !== '' && manualLon.trim() !== ''
+
+        if (hasManualLocation) {
+          latitude = parseFloat(manualLat)
+          longitude = parseFloat(manualLon)
+        } else if (latitude == null || longitude == null) {
           const browserLocation = await getBrowserLocation()
           latitude = browserLocation.latitude
           longitude = browserLocation.longitude
@@ -60,7 +67,7 @@ export default function UploadCard({ onResult }) {
         setStage('idle')
       }
     },
-    [onResult, submittedBy],
+    [onResult, submittedBy, manualLat, manualLon],
   )
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -89,6 +96,35 @@ export default function UploadCard({ onResult }) {
           placeholder="e.g. Jamie Rivera"
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-ocean-500 focus:outline-none focus:ring-1 focus:ring-ocean-500 disabled:opacity-50"
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-slate-700">
+          Reef location <span className="font-normal text-slate-400">(optional — overrides photo GPS)</span>
+        </label>
+        <div className="mt-1 grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            step="any"
+            value={manualLat}
+            onChange={(e) => setManualLat(e.target.value)}
+            disabled={busy}
+            placeholder="Latitude e.g. 9.0"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-ocean-500 focus:outline-none focus:ring-1 focus:ring-ocean-500 disabled:opacity-50"
+          />
+          <input
+            type="number"
+            step="any"
+            value={manualLon}
+            onChange={(e) => setManualLon(e.target.value)}
+            disabled={busy}
+            placeholder="Longitude e.g. 79.3"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-ocean-500 focus:outline-none focus:ring-1 focus:ring-ocean-500 disabled:opacity-50"
+          />
+        </div>
+        <p className="mt-1 text-xs text-slate-400">
+          Leave blank to use the photo&apos;s embedded GPS, or your device location as a fallback.
+        </p>
       </div>
 
       <div
