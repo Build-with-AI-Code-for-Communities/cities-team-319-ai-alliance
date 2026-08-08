@@ -18,7 +18,7 @@ Validate, resize, and store an image; extract GPS from EXIF if present.
 
 | Field | Type | Description |
 |---|---|---|
-| `file` | file | JPEG/PNG/WEBP, max 10MB |
+| `file` | file | JPEG/PNG/WEBP, max 25MB |
 
 **Response `201`:**
 
