@@ -1,40 +1,44 @@
 # Deployment Plan
 
-Target stack: **Vercel** (frontend) + **Render free tier** (backend) + **Neon** (managed PostgreSQL) + **Cloudflare R2** (object storage).
+Target stack: **Vercel** (frontend) + **Render free tier** (backend) + **Neon** (managed PostgreSQL). Object storage (Cloudflare R2 or similar) is optional — see below.
 
 Render's free web services are ideal for a hackathon budget, but come with two constraints this plan works around:
 
 - **No persistent disk** — the local filesystem is wiped on every redeploy and periodically on restart. SQLite and local `uploads/`/`reports/` don't survive this.
 - **Spins down after 15 min idle** — the first request after idle takes ~30-50s to cold-start. Nothing to fix here; just expect it in a demo.
 
-Neon solves the first problem for the database; R2 solves it for uploaded images and generated PDFs. Both have generous free tiers and need no credit card.
+Neon solves the first problem for the database. The second (uploaded images and generated PDFs not surviving a redeploy) only matters if you need those specific files to persist long-term — **survey data itself (classification, risk score, weather, everything the dashboard shows) is safe in Neon either way.** For a hackathon demo, it's reasonable to skip object storage entirely and accept that files reset on redeploy (which won't happen mid-demo). `render.yaml` defaults to this (`STORAGE_BACKEND=local`) so there's nothing to configure.
 
 ## 1. Database — Neon (free Postgres)
 
 1. Create a free project at https://neon.tech.
 2. Copy the connection string (looks like `postgresql://user:password@ep-xxxx.neon.tech/coral_ai?sslmode=require`).
 3. This becomes `DATABASE_URL` for the backend service below. SQLAlchemy + `psycopg2-binary` (already in `requirements.txt`) handle the rest — no code changes needed.
+4. Treat this connection string as a secret: paste it only into Render's environment variable dashboard, never into a file that gets committed, a chat, or a public channel. If it's ever been pasted somewhere it shouldn't have, reset the password from the Neon dashboard (Settings → Reset password) — takes seconds and immediately invalidates the old one.
 
-## 2. Object Storage — Cloudflare R2 (free 10GB tier)
+## 2. Object Storage (optional) — Cloudflare R2, Backblaze B2, or skip it
 
-The backend's storage layer (`src/backend/app/services/storage_service.py`) already supports any S3-compatible provider via `STORAGE_BACKEND=s3` — R2 is the recommended free option:
+The backend's storage layer (`src/backend/app/services/storage_service.py`) supports any S3-compatible provider via `STORAGE_BACKEND=s3` — pick whichever free tier is easiest to sign up for:
 
-1. In the Cloudflare dashboard, go to **R2** and create a bucket (e.g. `coral-ai`).
-2. Create an **R2 API token** (Account API Token, "Object Read & Write" permission) — this gives you an Access Key ID and Secret Access Key.
-3. Your endpoint URL is `https://<account_id>.r2.cloudflarestorage.com` (account ID is shown on the R2 dashboard).
-4. Set these on the Render service (see below):
-   ```bash
-   STORAGE_BACKEND=s3
-   S3_ENDPOINT_URL=https://<account_id>.r2.cloudflarestorage.com
-   S3_REGION=auto
-   S3_BUCKET_NAME=coral-ai
-   S3_ACCESS_KEY_ID=<your-r2-access-key-id>
-   S3_SECRET_ACCESS_KEY=<your-r2-secret-access-key>
-   ```
+| Provider | Free tier | Notes |
+|---|---|---|
+| **Skip it** (`STORAGE_BACKEND=local`, the `render.yaml` default) | N/A | Zero setup. Images/PDFs reset on redeploy; survey data does not. Recommended unless you specifically need file persistence. |
+| **Backblaze B2** | 10GB free, no credit card | Often the least friction to sign up for. Create a bucket + "Application Key" (their term for API key) at https://www.backblaze.com/b2/. |
+| **Cloudflare R2** | 10GB free | Requires a Cloudflare account with R2 enabled (sometimes asks for a credit card for verification even though usage stays free under 10GB). |
 
-With this set, uploaded images and generated PDF reports are written straight to R2 instead of local disk — they survive redeploys, and `GET /api/report/{id}/download` transparently 307-redirects to a short-lived presigned URL instead of serving a local file.
+Whichever you pick, set these on the Render service (see below) — the variable names are identical for every provider:
 
-Leaving `STORAGE_BACKEND=local` (the default) is fine for local development or a paid Render plan with a persistent disk mounted at `src/backend/uploads` and `src/backend/reports`.
+```bash
+STORAGE_BACKEND=s3
+S3_ENDPOINT_URL=<provider's S3 endpoint>      # R2: https://<account_id>.r2.cloudflarestorage.com
+                                                # B2: https://s3.<region>.backblazeb2.com
+S3_REGION=auto                                 # B2: use the region from your bucket, e.g. us-west-004
+S3_BUCKET_NAME=coral-ai
+S3_ACCESS_KEY_ID=<access key id>
+S3_SECRET_ACCESS_KEY=<secret access key>
+```
+
+With this set, uploaded images and generated PDF reports are written straight to the bucket instead of local disk — they survive redeploys, and `GET /api/report/{id}/download` transparently 307-redirects to a short-lived presigned URL instead of serving a local file.
 
 ## 3. Backend — Render
 
